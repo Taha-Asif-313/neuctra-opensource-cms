@@ -52,7 +52,10 @@ const App = () => {
                       <Route path="edit/:id" element={<EditBlogPage />} />
                     </Route>
 
-                    <Route path=":id" element={<BlogPostPage />} />
+                    <Route
+                      path="/blog/:userId/:blogId"
+                      element={<BlogPostPage />}
+                    />
                   </Route>
                 </Routes>
               </Suspense>

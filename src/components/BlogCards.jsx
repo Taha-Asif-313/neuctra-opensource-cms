@@ -10,7 +10,7 @@ const BlogCards = ({ blogs }) => {
     <div className="space-y-10">
       {/* Featured (minimal tech style) */}
       {featured && (
-        <Link to={`/blog/${featured.id}`} className="block group">
+        <Link to={`/blog/${featured.userId}/${featured.id}`} className="block group">
           <div className="border border-white/10 bg-white/5 rounded-2xl p-6 hover:border-white/20 transition">
             <div className="flex items-center gap-2 text-xs text-white/50 mb-3">
               <span className="px-2 py-1 bg-white/10 rounded-full">
@@ -47,7 +47,7 @@ const BlogCards = ({ blogs }) => {
         {rest?.map((blog) => (
           <Link
             key={blog.id}
-            to={`/blog/${blog.id}`}
+            to={`/blog/${blog.userId}/${blog.id}`}
             className="group border border-white/10 bg-white/5 rounded-xl p-5 hover:border-white/20 hover:-translate-y-1 transition"
           >
             <div className="text-xs text-white/40 mb-2">{blog.category}</div>

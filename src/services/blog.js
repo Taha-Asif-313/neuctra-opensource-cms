@@ -50,10 +50,7 @@ export const getSingleBlog = async (userId,dataId) => {
       dataId,
     });
 
-    return {
-      success: true,
-      data: blog,
-    };
+    return blog;
   } catch (error) {
     console.error("Get Single Blog Error:", error);
 

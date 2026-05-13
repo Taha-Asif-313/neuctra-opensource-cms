@@ -13,7 +13,6 @@ const AllBlogsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
 
-  console.log(blogs);
   
 
   /* ---------------- FETCH BLOGS ---------------- */
