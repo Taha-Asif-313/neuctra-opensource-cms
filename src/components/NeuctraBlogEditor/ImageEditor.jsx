@@ -23,10 +23,9 @@ const toggleClass = (active, color) => `
   transition-all
   duration-200
 
-  ${
-    active
-      ? `border-${color}-500 bg-${color}-500/10 text-${color}-300`
-      : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
+  ${active
+    ? `border-${color}-500 bg-${color}-500/10 text-${color}-300`
+    : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
   }
 `;
 
@@ -207,7 +206,6 @@ const ImageEditor = ({ value = {}, onChange, onDelete }) => {
         </div>
 
         {/* OBJECT FIT */}
-
         <div className="space-y-2">
           <label className="text-sm font-medium text-white/70">
             Object Fit
@@ -215,9 +213,9 @@ const ImageEditor = ({ value = {}, onChange, onDelete }) => {
 
           <Select
             value={value.objectFit || "cover"}
-            onChange={(e) =>
+            onValueChange={(value) =>
               update({
-                objectFit: e.target.value,
+                objectFit: value,
               })
             }
             options={[
@@ -239,66 +237,6 @@ const ImageEditor = ({ value = {}, onChange, onDelete }) => {
               },
             ]}
           />
-        </div>
-
-        {/* TOGGLES */}
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <button
-            onClick={() =>
-              update({
-                shadow: !value.shadow,
-              })
-            }
-            className={toggleClass(value.shadow, "emerald")}
-          >
-            <div className="flex items-center gap-2">
-              <Sparkles size={15} />
-              Shadow
-            </div>
-          </button>
-
-          <button
-            onClick={() =>
-              update({
-                clickable: !value.clickable,
-              })
-            }
-            className={toggleClass(value.clickable, "sky")}
-          >
-            <div className="flex items-center gap-2">
-              <MousePointer size={15} />
-              Clickable
-            </div>
-          </button>
-
-          <button
-            onClick={() =>
-              update({
-                showOverlay: !value.showOverlay,
-              })
-            }
-            className={toggleClass(value.showOverlay, "purple")}
-          >
-            <div className="flex items-center gap-2">
-              <LayoutTemplate size={15} />
-              Overlay
-            </div>
-          </button>
-
-          <button
-            onClick={() =>
-              update({
-                bordered: !value.bordered,
-              })
-            }
-            className={toggleClass(value.bordered, "amber")}
-          >
-            <div className="flex items-center gap-2">
-              <Shield size={15} />
-              Border
-            </div>
-          </button>
         </div>
 
         {/* OVERLAY TEXT */}
@@ -348,38 +286,9 @@ const ImageEditor = ({ value = {}, onChange, onDelete }) => {
             radius={value.radius || 24}
             opacity={value.opacity || 1}
             objectFit={value.objectFit || "cover"}
-            shadow={value.shadow || false}
-            clickable={value.clickable || false}
-            border={
-              value.bordered ? "1px solid rgba(255,255,255,0.1)" : undefined
-            }
             className="w-full"
             loading="lazy"
-            overlay={
-              value.showOverlay ? (
-                <div
-                  className="
-                    flex
-                    h-full
-                    flex-col
-                    items-start
-                    justify-end
-                    p-6
-                    text-white
-                  "
-                >
-                  <h3 className="text-2xl font-semibold">
-                    {value.caption || "Overlay Title"}
-                  </h3>
 
-                  {value.overlayText && (
-                    <p className="mt-2 text-sm text-white/80">
-                      {value.overlayText}
-                    </p>
-                  )}
-                </div>
-              ) : null
-            }
             fallback={
               <div
                 className="

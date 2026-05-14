@@ -1,41 +1,60 @@
 import { Type } from "lucide-react";
 
-const RichTextPreview = ({ value = "" }) => {
+const RichTextPreview = ({ value = "", className = "" }) => {
   const hasContent =
     value && value.replace(/<p><br><\/p>|<p><\/p>|<br>/gi, "").trim();
 
   if (!hasContent) return null;
 
   return (
-    <div className="border-t border-white/10">
-      {/* HEADER */}
-      <div className="flex items-center gap-2 border-b border-white/10 bg-white/2 px-5 py-3">
-        <Type size={14} className="text-white/40" />
-        <span className="text-xs font-medium uppercase tracking-wide text-white/50">
-          Live Preview
-        </span>
-      </div>
+    <div
+      className={`
+        prose prose-invert max-w-none
+        prose-p:text-white/75
+        prose-p:leading-8
+        prose-p:text-lg
+        prose-strong:text-white
+        prose-em:text-white/60
+        prose-a:text-cyan-400
+        prose-a:no-underline
+        prose-a:hover:underline
+        prose-headings:text-white
+        prose-h1:text-3xl
+        prose-h2:text-2xl
+        prose-h3:text-xl
+        prose-ul:list-disc
+        prose-ol:list-decimal
+        prose-li:text-white/75
+        prose-li:text-lg
+        prose-li:leading-7
+        prose-li:pl-2
+        prose-li:my-2
+        prose-code:text-cyan-400
+        prose-code:bg-white/5
+        prose-code:px-1.5
+        prose-code:py-0.5
+        prose-code:rounded
+        prose-pre:bg-black/40
+        prose-pre:border
+        prose-pre:border-white/10
+        prose-pre:rounded-xl
 
-      {/* CONTENT */}
-      <div className="p-5">
-        <div
-          className="
-            prose prose-invert max-w-none text-white/80
-            prose-p:text-white/80
-            prose-strong:text-white
-            prose-headings:text-white
-            prose-li:text-white/80
+        [&_blockquote]:border-l-4
+        [&_blockquote]:border-cyan-400/60
+        [&_blockquote]:pl-6
+        [&_blockquote]:italic
+        [&_blockquote]:text-white/70
+        [&_blockquote]:text-2xl
+        [&_blockquote]:my-6
 
-            [&_blockquote]:border-l-2
-            [&_blockquote]:border-cyan-400/60
-            [&_blockquote]:pl-4
-            [&_blockquote]:italic
-            [&_blockquote]:text-white/70
-          "
-          dangerouslySetInnerHTML={{ __html: value || "" }}
-        />
-      </div>
-    </div>
+        [&_ul]:space-y-2
+        [&_ul]:pl-6
+        [&_ol]:space-y-2
+        [&_ol]:pl-6
+        ${className}
+      `}
+      dangerouslySetInnerHTML={{ __html: value || "" }}
+    />
   );
 };
 

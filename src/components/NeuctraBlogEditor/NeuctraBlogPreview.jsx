@@ -2,106 +2,34 @@
 
 import React from "react";
 import CodeBlock from "./CodeBlock";
+import RichTextPreview from "./RichTextPreview";
+import HeadingPreview from "./HeadingPreview";
+import ImagePreview from "./ImagePreview";
+import TablePreview from "./TablePreview";
 
 const NeuctraBlogPreview = ({ blocks = [], className = "" }) => {
-  const renderHTML = (html) => {
-    return (
-      <div
-        className="text-white/75 leading-8 text-lg"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
-    );
-  };
-
   return (
     <div className={`space-y-6 ${className}`}>
       {blocks.map((block) => {
         // TEXT (NOW RICH HTML)
         if (block.type === "text") {
-          return (
-            <div
-              key={block.id}
-              className="
-                prose prose-invert max-w-none
-                text-white/75
-                [&_blockquote]:border-l-2
-[&_blockquote]:border-cyan-400/60
-[&_blockquote]:pl-4
-[&_blockquote]:italic
-[&_blockquote]:text-white/70
-              "
-              dangerouslySetInnerHTML={{
-                __html: block.content,
-              }}
-            />
-          );
+          return <RichTextPreview key={block.id} value={block.content} />;
         }
 
         // HEADING (RICH HTML SUPPORT)
         if (block.type === "heading") {
           return (
-            <h2
+            <HeadingPreview
               key={block.id}
-              className="text-3xl md:text-4xl font-bold leading-tight"
-              dangerouslySetInnerHTML={{
-                __html: block.content,
-              }}
+              value={block.content}
+              level={block.level}
             />
-          );
-        }
-
-        // QUOTE (RICH HTML)
-        if (block.type === "quote") {
-          return (
-            <blockquote
-              key={block.id}
-              className="border-l-4 border-primary pl-6 text-2xl text-white/70"
-              dangerouslySetInnerHTML={{
-                __html: block.content,
-              }}
-            />
-          );
-        }
-
-        // LIST (KEEP ARRAY OR HTML SAFE FALLBACK)
-        if (block.type === "list") {
-          return (
-            <ul
-              key={block.id}
-              className="space-y-3 list-disc pl-6 text-white/75"
-            >
-              {block.items.map((item, i) => (
-                <li
-                  key={i}
-                  dangerouslySetInnerHTML={{
-                    __html: item,
-                  }}
-                  className="text-lg"
-                />
-              ))}
-            </ul>
           );
         }
 
         // IMAGE
         if (block.type === "image") {
-          return (
-            <div key={block.id} className="space-y-4">
-              {block.url && (
-                <img
-                  src={block.url}
-                  alt={block.caption}
-                  className="w-full rounded-3xl border border-white/10"
-                />
-              )}
-
-              {block.caption && (
-                <p className="text-center text-sm text-white/40">
-                  {block.caption}
-                </p>
-              )}
-            </div>
-          );
+          return <ImagePreview key={block.id} value={block} />;
         }
 
         // CODE
@@ -115,42 +43,16 @@ const NeuctraBlogPreview = ({ blocks = [], className = "" }) => {
           );
         }
 
-        // TABLE (unchanged)
+        // TABLE (now using TablePreview)
         if (block.type === "table") {
           return (
-            <div
-              key={block.id}
-              className="overflow-auto rounded-2xl border border-white/10"
-            >
-              <table className="w-full border-collapse">
-                <thead className="bg-white/3">
-                  <tr>
-                    {block.headers.map((header, i) => (
-                      <th
-                        key={i}
-                        className="border border-white/10 px-5 py-3 text-left"
-                      >
-                        {header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {block.rows.map((row, rowIndex) => (
-                    <tr key={rowIndex}>
-                      {row.map((cell, cellIndex) => (
-                        <td
-                          key={cellIndex}
-                          className="border border-white/10 px-5 py-3 text-white/70"
-                        >
-                          {cell}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div key={block.id} className="rounded-2xl border border-white/10">
+              <TablePreview
+                headers={block.headers}
+                rows={block.rows}
+                striped
+                hoverable
+              />
             </div>
           );
         }

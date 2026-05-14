@@ -12,20 +12,7 @@ export const createBlock = (type) => {
         id: crypto.randomUUID(),
         type: "heading",
         content: "",
-      };
-
-    case "quote":
-      return {
-        id: crypto.randomUUID(),
-        type: "quote",
-        content: "",
-      };
-
-    case "list":
-      return {
-        id: crypto.randomUUID(),
-        type: "list",
-        items: [""],
+        level: "h1",
       };
 
     case "image":
@@ -34,6 +21,11 @@ export const createBlock = (type) => {
         type: "image",
         url: "",
         caption: "",
+        width: "100%",
+        height: 400,
+        radius: 24,
+        opacity: 1,
+        objectFit: "cover",
       };
 
     case "code":

@@ -50,7 +50,6 @@ const CreateBlogPage = () => {
     featured: false,
 
     blocks: [
-      createBlock("heading"),
       createBlock("text"),
     ],
   });

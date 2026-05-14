@@ -4,14 +4,9 @@ import React, { useEffect, useRef, useState } from "react";
 
 import {
   Type,
-  List,
   Image,
   Code2,
   Table,
-  Trash2,
-  GripVertical,
-  Plus,
-  Quote,
   Heading1,
   Eye,
   EyeOff,
@@ -30,6 +25,7 @@ import HeadingEditor from "./HeadingEditor";
 import CodeBlockEditor from "./CodeBlockEditor";
 import TableEditor from "./TableEditor";
 import ImageEditor from "./ImageEditor";
+import { Editor } from "@monaco-editor/react";
 
 const NeuctraBlogEditor = ({
   blocks = [],
@@ -138,7 +134,6 @@ const NeuctraBlogEditor = ({
   return (
     <div className={className}>
       {/* TOOLBAR */}
-
       {showToolbar && (
         <div className="flex flex-wrap gap-3 mb-6">
           <ToolbarButton
@@ -322,25 +317,27 @@ const NeuctraBlogEditor = ({
           {/* JSON CONTENT */}
 
           {editMode ? (
-            <Textarea
+            <Editor
+              height="500px"
+              defaultLanguage="json"
               value={jsonValue}
-              onChange={(e) => {
-                setJsonValue(e.target.value);
+              theme="vs-dark"
+              onChange={(value) => {
+                setJsonValue(value || "");
 
                 if (jsonError) {
                   setJsonError("");
                 }
               }}
-              rows={24}
-              className="
-          min-h-125
-          rounded-none
-          border-0
-          bg-transparent
-          font-mono
-          text-sm
-          text-green-400
-        "
+              options={{
+                minimap: { enabled: false },
+                fontSize: 13,
+                wordWrap: "on",
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+                formatOnPaste: true,
+                formatOnType: true,
+              }}
             />
           ) : (
             <pre

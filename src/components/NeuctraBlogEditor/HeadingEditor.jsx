@@ -1,13 +1,4 @@
-import {
-  Heading1,
-  Heading2,
-  Heading3,
-  Heading4,
-  Heading5,
-  Heading6,
-  Type,
-  Trash2,
-} from "lucide-react";
+import { Type, Trash2, Heading } from "lucide-react";
 
 /* =========================================
    HEADING EDITOR
@@ -24,50 +15,42 @@ const HeadingEditor = ({
   const levels = [
     {
       value: "h1",
-      icon: Heading1,
       label: "H1",
       className: "text-5xl font-black",
     },
 
     {
       value: "h2",
-      icon: Heading2,
       label: "H2",
       className: "text-4xl font-bold",
     },
 
     {
       value: "h3",
-      icon: Heading3,
       label: "H3",
       className: "text-3xl font-bold",
     },
 
     {
       value: "h4",
-      icon: Heading4,
       label: "H4",
       className: "text-2xl font-semibold",
     },
 
     {
       value: "h5",
-      icon: Heading5,
       label: "H5",
       className: "text-xl font-semibold",
     },
 
     {
       value: "h6",
-      icon: Heading6,
       label: "H6",
       className: "text-lg font-medium",
     },
   ];
 
   const current = levels.find((item) => item.value === level) || levels[0];
-
-  const CurrentIcon = current.icon;
 
   return (
     <div
@@ -86,7 +69,7 @@ const HeadingEditor = ({
         {/* LEFT */}
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center rounded-lg px-4 py-2.5 bg-violet-400/5">
-            <CurrentIcon size={14} className="text-violet-400" />
+            <Heading size={14} className="text-violet-400" />
           </div>
 
           <div>
@@ -151,8 +134,6 @@ const HeadingEditor = ({
         {levels.map((item) => {
           const active = level === item.value;
 
-          const Icon = item.icon;
-
           return (
             <button
               key={item.value}
@@ -187,7 +168,6 @@ const HeadingEditor = ({
                 }
               `}
             >
-
               {item.label}
             </button>
           );
@@ -195,7 +175,6 @@ const HeadingEditor = ({
       </div>
 
       {/* INPUT */}
-
       <div className="p-5">
         <input
           type="text"
@@ -214,51 +193,6 @@ const HeadingEditor = ({
           `}
         />
       </div>
-
-      {/* PREVIEW */}
-
-      {value?.trim() && (
-        <div className="border-t border-white/10">
-          <div
-            className="
-              flex
-              items-center
-              gap-2
-              border-b
-              border-white/10
-              bg-white/2
-              px-5
-              py-3
-            "
-          >
-            <Type size={14} className="text-white/40" />
-
-            <span
-              className="
-                text-xs
-                font-medium
-                uppercase
-                tracking-wide
-                text-white/50
-              "
-            >
-              Live Preview
-            </span>
-          </div>
-
-          <div className="p-5">
-            <div
-              className={`
-                text-white
-
-                ${current.className}
-              `}
-            >
-              {value}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
