@@ -3,10 +3,7 @@
 import React from "react";
 import CodeBlock from "./CodeBlock";
 
-const NeuctraBlogPreview = ({
-  blocks = [],
-  className = "",
-}) => {
+const NeuctraBlogPreview = ({ blocks = [], className = "" }) => {
   const renderHTML = (html) => {
     return (
       <div
@@ -27,6 +24,11 @@ const NeuctraBlogPreview = ({
               className="
                 prose prose-invert max-w-none
                 text-white/75
+                [&_blockquote]:border-l-2
+[&_blockquote]:border-cyan-400/60
+[&_blockquote]:pl-4
+[&_blockquote]:italic
+[&_blockquote]:text-white/70
               "
               dangerouslySetInnerHTML={{
                 __html: block.content,

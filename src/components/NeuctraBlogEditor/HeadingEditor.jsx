@@ -5,6 +5,8 @@ import {
   Heading4,
   Heading5,
   Heading6,
+  Type,
+  Trash2,
 } from "lucide-react";
 
 /* =========================================
@@ -16,6 +18,7 @@ const HeadingEditor = ({
   level = "h1",
   onChange,
   onLevelChange,
+  onDelete,
   placeholder = "Heading...",
 }) => {
   const levels = [
@@ -25,30 +28,35 @@ const HeadingEditor = ({
       label: "H1",
       className: "text-5xl font-black",
     },
+
     {
       value: "h2",
       icon: Heading2,
       label: "H2",
       className: "text-4xl font-bold",
     },
+
     {
       value: "h3",
       icon: Heading3,
       label: "H3",
       className: "text-3xl font-bold",
     },
+
     {
       value: "h4",
       icon: Heading4,
       label: "H4",
       className: "text-2xl font-semibold",
     },
+
     {
       value: "h5",
       icon: Heading5,
       label: "H5",
       className: "text-xl font-semibold",
     },
+
     {
       value: "h6",
       icon: Heading6,
@@ -59,12 +67,91 @@ const HeadingEditor = ({
 
   const current = levels.find((item) => item.value === level) || levels[0];
 
+  const CurrentIcon = current.icon;
+
   return (
-    <div className="rounded-2xl border border-white/10 overflow-hidden bg-black/20">
-      {/* TOOLBAR */}
-      <div className="flex flex-wrap items-center gap-2 p-3 border-b border-white/10 bg-white/2">
+    <div
+      className="
+        overflow-hidden
+        rounded-3xl
+        border
+        border-white/10
+        bg-linear-to-b
+        from-white/3
+        to-transparent
+      "
+    >
+      {/* HEADER */}
+      <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+        {/* LEFT */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center rounded-lg px-4 py-2.5 bg-violet-400/5">
+            <CurrentIcon size={14} className="text-violet-400" />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-white">Heading Editor</h3>
+            <p className="text-xs text-white/40">
+              Create structured headings with hierarchy
+            </p>
+          </div>
+        </div>
+
+        {/* RIGHT */}
+        <div className="flex items-center gap-3">
+          {/* LEVEL BADGE (matched to preview style) */}
+          <div
+            className="
+        flex items-center
+        rounded-lg
+        px-4 py-2.5
+        text-xs
+        leading-none
+        bg-white/5
+        text-white/60
+      "
+          >
+            {current.label}
+          </div>
+
+          {/* DELETE */}
+          <button
+            onClick={onDelete}
+            className="
+        flex items-center justify-center
+        rounded-lg
+        px-4 py-2.5
+        bg-red-600/5
+        text-red-500
+        transition-all duration-200
+        hover:bg-red-500/10
+        hover:text-red-400
+        hover:scale-105
+      "
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
+      </div>
+
+      {/* LEVEL SELECTOR */}
+
+      <div
+        className="
+          flex
+          flex-wrap
+          items-center
+          gap-2
+          border-b
+          border-white/10
+          bg-white/2
+          p-4
+        "
+      >
         {levels.map((item) => {
           const active = level === item.value;
+
+          const Icon = item.icon;
 
           return (
             <button
@@ -75,55 +162,103 @@ const HeadingEditor = ({
                 flex
                 items-center
                 gap-2
-                px-3
-                py-2
-                rounded-xl
+                rounded-lg
                 border
+                px-4
+                py-2.5
+                text-xs
                 transition-all
                 duration-200
 
                 ${
                   active
                     ? `
-                      border-white/20
-                      bg-white/10
-                      text-white
-                      shadow-[0_0_0_1px_rgba(255,255,255,0.04)]
+                      border-violet-500/30
+                      bg-violet-500/10
+                      text-violet-300
                     `
                     : `
                       border-white/10
-                      bg-white/3
+                      bg-white/5
                       text-white/60
-                      hover:bg-white/6
-                      hover:text-white/90
+                      hover:bg-white/10
+                      hover:text-white
                     `
                 }
               `}
             >
-              <span className="text-xs font-medium">{item.label}</span>
+
+              {item.label}
             </button>
           );
         })}
       </div>
 
       {/* INPUT */}
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={`
-          w-full
-          bg-transparent
-          outline-none
-          p-5
-          text-white
-          placeholder:text-white/30
-          transition-all
 
-          ${current.className}
-        `}
-      />
+      <div className="p-5">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className={`
+            w-full
+            bg-transparent
+            outline-none
+            text-white
+            placeholder:text-white/30
+            transition-all
+
+            ${current.className}
+          `}
+        />
+      </div>
+
+      {/* PREVIEW */}
+
+      {value?.trim() && (
+        <div className="border-t border-white/10">
+          <div
+            className="
+              flex
+              items-center
+              gap-2
+              border-b
+              border-white/10
+              bg-white/2
+              px-5
+              py-3
+            "
+          >
+            <Type size={14} className="text-white/40" />
+
+            <span
+              className="
+                text-xs
+                font-medium
+                uppercase
+                tracking-wide
+                text-white/50
+              "
+            >
+              Live Preview
+            </span>
+          </div>
+
+          <div className="p-5">
+            <div
+              className={`
+                text-white
+
+                ${current.className}
+              `}
+            >
+              {value}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

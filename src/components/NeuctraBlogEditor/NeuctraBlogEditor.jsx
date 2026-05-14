@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import {
   Type,
@@ -13,6 +13,13 @@ import {
   Plus,
   Quote,
   Heading1,
+  Eye,
+  EyeOff,
+  Copy,
+  Check,
+  AlertCircle,
+  Save,
+  Pencil,
 } from "lucide-react";
 
 import { Input, Textarea, Button } from "@neuctra/ui";
@@ -22,7 +29,7 @@ import RichTextEditor from "./RichTextEditor";
 import HeadingEditor from "./HeadingEditor";
 import CodeBlockEditor from "./CodeBlockEditor";
 import TableEditor from "./TableEditor";
-import QuoteEditor from "./QuoteEditor";
+import ImageEditor from "./ImageEditor";
 
 const NeuctraBlogEditor = ({
   blocks = [],
@@ -30,6 +37,18 @@ const NeuctraBlogEditor = ({
   className = "",
   showToolbar = true,
 }) => {
+  /* =========================================================
+     STATE
+  ========================================================= */
+
+  const [showBlocksPreview, setShowBlocksPreview] = useState(false);
+
+  const [editMode, setEditMode] = useState(false);
+
+  const [jsonValue, setJsonValue] = useState(JSON.stringify(blocks, null, 2));
+
+  const [jsonError, setJsonError] = useState("");
+
   /* =========================================================
      REFS
   ========================================================= */
@@ -52,6 +71,12 @@ const NeuctraBlogEditor = ({
 
     previousBlocksLengthRef.current = blocks.length;
   }, [blocks]);
+
+  useEffect(() => {
+    if (!editMode) {
+      setJsonValue(JSON.stringify(blocks, null, 2));
+    }
+  }, [blocks, editMode]);
 
   /* =========================================================
      ADD BLOCK
@@ -79,6 +104,37 @@ const NeuctraBlogEditor = ({
     setBlocks((prev) => prev.filter((b) => b.id !== id));
   };
 
+  /* =========================================================
+     COPY BLOCKS JSON
+  ========================================================= */
+
+  const copyBlocks = async () => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(blocks, null, 2));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const saveEditedBlocks = () => {
+    try {
+      const parsed = JSON.parse(jsonValue);
+
+      if (!Array.isArray(parsed)) {
+        setJsonError("Blocks must be an array");
+        return;
+      }
+
+      setBlocks(parsed);
+
+      setJsonError("");
+
+      setEditMode(false);
+    } catch (error) {
+      setJsonError(error.message);
+    }
+  };
+
   return (
     <div className={className}>
       {/* TOOLBAR */}
@@ -98,18 +154,6 @@ const NeuctraBlogEditor = ({
           />
 
           <ToolbarButton
-            icon={Quote}
-            label="Quote"
-            onClick={() => addBlock("quote")}
-          />
-
-          <ToolbarButton
-            icon={List}
-            label="List"
-            onClick={() => addBlock("list")}
-          />
-
-          <ToolbarButton
             icon={Image}
             label="Image"
             onClick={() => addBlock("image")}
@@ -126,223 +170,310 @@ const NeuctraBlogEditor = ({
             label="Table"
             onClick={() => addBlock("table")}
           />
+
+          {/* SHOW BLOCKS BUTTON */}
+
+          <ToolbarButton
+            icon={showBlocksPreview ? EyeOff : Eye}
+            label={showBlocksPreview ? "Hide Blocks" : "Show Blocks"}
+            onClick={() => setShowBlocksPreview((prev) => !prev)}
+          />
+        </div>
+      )}
+
+      {/* BLOCKS PREVIEW */}
+      {showBlocksPreview && (
+        <div
+          className="
+      mb-6
+      overflow-hidden
+      rounded-3xl
+      border
+      border-white/10
+      bg-black/40
+      backdrop-blur-xl
+    "
+        >
+          {/* HEADER */}
+
+          <div
+            className="
+        flex
+        items-center
+        justify-between
+        border-b
+        border-white/10
+        px-5
+        py-4
+      "
+          >
+            <div>
+              <h3 className="text-sm font-semibold text-white">
+                Blocks Manager
+              </h3>
+
+              <p className="text-xs text-white/40">
+                View, edit, import & update blog blocks
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {/* EDIT BUTTON */}
+
+              <button
+                onClick={() => setEditMode((prev) => !prev)}
+                className="
+            flex
+            items-center
+            gap-2
+            rounded-xl
+            border
+            border-white/10
+            bg-white/5
+            px-4
+            py-2
+            text-xs
+            text-white/70
+            transition
+            hover:bg-white/10
+            hover:text-white
+          "
+              >
+                <Pencil size={14} />
+
+                {editMode ? "Cancel" : "Edit JSON"}
+              </button>
+
+              {/* COPY */}
+
+              <button
+                onClick={copyBlocks}
+                className="
+            flex
+            items-center
+            gap-2
+            rounded-xl
+            border
+            border-white/10
+            bg-white/5
+            px-4
+            py-2
+            text-xs
+            text-white/70
+            transition
+            hover:bg-white/10
+            hover:text-white
+          "
+              >
+                <Copy size={14} />
+                Copy
+              </button>
+
+              {/* SAVE */}
+
+              {editMode && (
+                <button
+                  onClick={saveEditedBlocks}
+                  className="
+              flex
+              items-center
+              gap-2
+              rounded-xl
+              bg-emerald-500
+              px-4
+              py-2
+              text-xs
+              font-medium
+              text-white
+              transition
+              hover:opacity-90
+            "
+                >
+                  <Save size={14} />
+                  Save Changes
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* ERROR */}
+
+          {jsonError && (
+            <div
+              className="
+          flex
+          items-center
+          gap-2
+          border-b
+          border-red-500/20
+          bg-red-500/10
+          px-4
+          py-3
+          text-sm
+          text-red-300
+        "
+            >
+              <AlertCircle size={15} />
+
+              {jsonError}
+            </div>
+          )}
+
+          {/* JSON CONTENT */}
+
+          {editMode ? (
+            <Textarea
+              value={jsonValue}
+              onChange={(e) => {
+                setJsonValue(e.target.value);
+
+                if (jsonError) {
+                  setJsonError("");
+                }
+              }}
+              rows={24}
+              className="
+          min-h-125
+          rounded-none
+          border-0
+          bg-transparent
+          font-mono
+          text-sm
+          text-green-400
+        "
+            />
+          ) : (
+            <pre
+              className="
+          max-h-150
+          overflow-auto
+          p-5
+          font-mono
+          text-sm
+          leading-7
+          text-green-400
+        "
+            >
+              {JSON.stringify(blocks, null, 2)}
+            </pre>
+          )}
+
+          {/* FOOTER */}
+
+          <div
+            className="
+        flex
+        items-center
+        justify-between
+        border-t
+        border-white/10
+        px-5
+        py-3
+        text-xs
+        text-white/40
+      "
+          >
+            <span>Total Blocks: {blocks.length}</span>
+
+            <div className="flex items-center gap-2">
+              <Check size={13} />
+              Live Synced Editor
+            </div>
+          </div>
         </div>
       )}
 
       {/* BLOCKS */}
-
-      <div className="space-y-6">
-        {blocks.map((block, index) => (
-          <div
-            key={block.id}
-            ref={index === blocks.length - 1 ? lastBlockRef : null}
-            className="
-              rounded-2xl
-              border-t
-              border-white/10
-              overflow-hidden
-            "
-          >
-            {/* HEADER */}
+      {!showBlocksPreview && (
+        <div className="space-y-6">
+          {blocks.map((block, index) => (
             <div
-              className="
-                flex
-                items-center
-                justify-between
-                px-4
-                py-3
-                border-b
-                border-white/10
-                bg-white/2
-              "
+              key={block.id}
+              ref={index === blocks.length - 1 ? lastBlockRef : null}
             >
-              <div className="flex items-center gap-3">
-                <GripVertical size={15} className="text-white/30" />
+              {/* CONTENT */}
 
-                <span
-                  className="
-                    text-xs
-                    uppercase
-                    tracking-wide
-                    text-white/40
-                  "
-                >
-                  {block.type} block
-                </span>
+              <div className="pt-2">
+                {/* TEXT */}
+                {block.type === "text" && (
+                  <RichTextEditor
+                    value={block.content}
+                    onChange={(value) =>
+                      updateBlock(block.id, {
+                        content: value,
+                      })
+                    }
+                    onDelete={() => deleteBlock(block.id)}
+                    placeholder="Write paragraph..."
+                  />
+                )}
+
+                {/* HEADING */}
+                {block.type === "heading" && (
+                  <HeadingEditor
+                    value={block.content}
+                    level={block.level || "h1"}
+                    onChange={(content) =>
+                      updateBlock(block.id, {
+                        content,
+                      })
+                    }
+                    onLevelChange={(level) =>
+                      updateBlock(block.id, {
+                        level,
+                      })
+                    }
+                    onDelete={() => deleteBlock(block.id)}
+                  />
+                )}
+
+                {/* IMAGE */}
+                {block.type === "image" && (
+                  <ImageEditor
+                    value={block}
+                    onChange={(data) => updateBlock(block.id, data)}
+                    onDelete={() => deleteBlock(block.id)}
+                  />
+                )}
+
+                {/* CODE */}
+                {block.type === "code" && (
+                  <CodeBlockEditor
+                    value={block.content}
+                    language={block.language || "javascript"}
+                    onChange={(content) =>
+                      updateBlock(block.id, {
+                        content,
+                      })
+                    }
+                    onLanguageChange={(language) =>
+                      updateBlock(block.id, {
+                        language,
+                      })
+                    }
+                    onDelete={() => deleteBlock(block.id)}
+                  />
+                )}
+
+                {/* TABLE */}
+                {block.type === "table" && (
+                  <TableEditor
+                    headers={block.headers}
+                    rows={block.rows}
+                    onChange={({ headers, rows }) =>
+                      updateBlock(block.id, {
+                        headers,
+                        rows,
+                      })
+                    }
+                    onDelete={() => deleteBlock(block.id)}
+                  />
+                )}
               </div>
-
-              <button
-                onClick={() => deleteBlock(block.id)}
-                className="
-                  text-white/40
-                  hover:text-red-400
-                "
-              >
-                <Trash2 size={15} />
-              </button>
             </div>
-
-            {/* CONTENT */}
-            <div className="pt-2">
-              {/* TEXT */}
-
-              {block.type === "text" && (
-                <RichTextEditor
-                  value={block.content}
-                  onChange={(value) =>
-                    updateBlock(block.id, {
-                      content: value,
-                    })
-                  }
-                  placeholder="Write paragraph..."
-                />
-              )}
-
-              {/* HEADING */}
-              {block.type === "heading" && (
-                <HeadingEditor
-                  value={block.content}
-                  level={block.level || "h1"}
-                  onChange={(content) =>
-                    updateBlock(block.id, {
-                      content,
-                    })
-                  }
-                  onLevelChange={(level) =>
-                    updateBlock(block.id, {
-                      level,
-                    })
-                  }
-                />
-              )}
-
-              {/* QUOTE */}
-              {block.type === "quote" && (
-                <QuoteEditor
-                  value={block.content}
-                  author={block.author || ""}
-                  onChange={(content) =>
-                    updateBlock(block.id, {
-                      content,
-                    })
-                  }
-                  onAuthorChange={(author) =>
-                    updateBlock(block.id, {
-                      author,
-                    })
-                  }
-                />
-              )}
-
-              {/* IMAGE */}
-
-              {block.type === "image" && (
-                <div className="space-y-4">
-                  <Input
-                    value={block.url}
-                    onChange={(e) =>
-                      updateBlock(block.id, {
-                        url: e.target.value,
-                      })
-                    }
-                    placeholder="Image URL..."
-                  />
-
-                  <Input
-                    value={block.caption}
-                    onChange={(e) =>
-                      updateBlock(block.id, {
-                        caption: e.target.value,
-                      })
-                    }
-                    placeholder="Image caption..."
-                  />
-
-                  {block.url && (
-                    <img
-                      src={block.url}
-                      alt=""
-                      className="
-                        w-full
-                        rounded-xl
-                        border
-                        border-white/10
-                      "
-                    />
-                  )}
-                </div>
-              )}
-
-              {/* CODE */}
-              {block.type === "code" && (
-                <CodeBlockEditor
-                  value={block.content}
-                  language={block.language || "javascript"}
-                  onChange={(content) =>
-                    updateBlock(block.id, {
-                      content,
-                    })
-                  }
-                  onLanguageChange={(language) =>
-                    updateBlock(block.id, {
-                      language,
-                    })
-                  }
-                />
-              )}
-
-              {/* LIST */}
-
-              {block.type === "list" && (
-                <div className="space-y-3">
-                  {block.items.map((item, itemIndex) => (
-                    <Input
-                      key={itemIndex}
-                      value={item}
-                      onChange={(e) => {
-                        const updated = [...block.items];
-
-                        updated[itemIndex] = e.target.value;
-
-                        updateBlock(block.id, {
-                          items: updated,
-                        });
-                      }}
-                      placeholder={`List item ${itemIndex + 1}`}
-                    />
-                  ))}
-
-                  <Button
-                    variant="outline"
-                    leftIcon={Plus}
-                    onClick={() => {
-                      updateBlock(block.id, {
-                        items: [...block.items, ""],
-                      });
-                    }}
-                  >
-                    Add Item
-                  </Button>
-                </div>
-              )}
-
-              {/* TABLE */}
-              {block.type === "table" && (
-                <TableEditor
-                  headers={block.headers}
-                  rows={block.rows}
-                  onChange={({ headers, rows }) =>
-                    updateBlock(block.id, {
-                      headers,
-                      rows,
-                    })
-                  }
-                />
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
