@@ -371,7 +371,7 @@ const AdminPanelPage = () => {
                           text={blog.visibility || "public"}
                           size="md"
                           variant="soft"
-                          className="bg-zinc-900! capitalize text-zinc-100"
+                          className="bg-zinc-800! capitalize text-zinc-100"
                         />
                       </div>
 

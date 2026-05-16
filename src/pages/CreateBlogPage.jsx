@@ -3,7 +3,15 @@
 import React, { useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
-import { ArrowLeft, Save, Eye, Sparkles, Folder, Tag } from "lucide-react";
+import {
+  ArrowLeft,
+  Save,
+  Eye,
+  Sparkles,
+  Folder,
+  Tag,
+  ImagePlus,
+} from "lucide-react";
 
 import { Input, Select, Button, Checkbox, Switch } from "@neuctra/ui";
 
@@ -16,6 +24,7 @@ import { NeuctraEditor, NeuctraEditorPreview } from "@neuctra/cms-core";
 import { createBlock } from "../utils/blogBlocks";
 import { defaultBlogState } from "../states/blog";
 import BlogPreviewModal from "../components/BlogPreviewModal";
+import CoverImageModal from "../components/modals/CoverImageModal";
 
 /* =========================================================
    PAGE
@@ -23,12 +32,10 @@ import BlogPreviewModal from "../components/BlogPreviewModal";
 
 const CreateBlogPage = () => {
   const navigate = useNavigate();
-
   const { user } = useAdmin();
-
   const [loading, setLoading] = useState(false);
-
   const [showPreview, setShowPreview] = useState(false);
+  const [showCoverModal, setShowCoverModal] = useState(false);
 
   const [formData, setFormData] = useState(() =>
     defaultBlogState({
@@ -114,9 +121,9 @@ const CreateBlogPage = () => {
 
       const blogData = {
         title: formData.title,
-        excerpt: formData.excerpt,
         category: formData.category,
         featured: formData.featured,
+        coverImage: formData.coverImage,
         visibility: formData.visibility,
         tags: formData.tags
           .split(",")
@@ -172,6 +179,14 @@ const CreateBlogPage = () => {
 
             {/* RIGHT ACTIONS */}
             <div className="flex items-center gap-3">
+              <Button
+                leftIcon={ImagePlus}
+                variant="outline"
+                className="rounded-xl"
+                onClick={() => setShowCoverModal(true)}
+              >
+                Cover Image
+              </Button>
               <Button
                 variant="outline"
                 leftIcon={Eye}
@@ -309,6 +324,13 @@ const CreateBlogPage = () => {
         onClose={() => setShowPreview(false)}
         formData={formData}
         wordCount={wordCount}
+      />
+
+      <CoverImageModal
+        isOpen={showCoverModal}
+        onClose={() => setShowCoverModal(false)}
+        formData={formData}
+        setFormData={setFormData}
       />
     </ReactSignedIn>
   );

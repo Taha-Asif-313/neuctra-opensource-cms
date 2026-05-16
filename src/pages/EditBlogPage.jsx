@@ -3,7 +3,15 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
-import { ArrowLeft, Save, Eye, Sparkles, Folder, Tag } from "lucide-react";
+import {
+  ArrowLeft,
+  Save,
+  Eye,
+  Sparkles,
+  Folder,
+  Tag,
+  ImagePlus,
+} from "lucide-react";
 
 import { Input, Select, Button, Checkbox, Switch } from "@neuctra/ui";
 
@@ -16,6 +24,7 @@ import { NeuctraEditor, NeuctraEditorPreview } from "@neuctra/cms-core";
 import { createBlock } from "../utils/blogBlocks";
 import { defaultBlogState } from "../states/blog";
 import BlogPreviewModal from "../components/BlogPreviewModal";
+import CoverImageModal from "../components/modals/CoverImageModal";
 
 /* =========================================================
    PAGE
@@ -32,6 +41,7 @@ const EditBlogPage = () => {
 
   const [blog, setBlog] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [showCoverModal, setShowCoverModal] = useState(false);
 
   const [formData, setFormData] = useState(null);
 
@@ -72,7 +82,6 @@ const EditBlogPage = () => {
               id: blogData.id || "",
               slug: blogData.slug || "",
               title: blogData.title || "",
-              excerpt: blogData.excerpt || "",
               coverImage: blogData.coverImage || "",
               authorId: blogData.authorId || user?.id || "",
               author: {
@@ -157,7 +166,8 @@ const EditBlogPage = () => {
 
       const blogData = {
         title: formData.title,
-        excerpt: formData.excerpt,
+        coverImage: formData.coverImage,
+        visibility: formData.visibility,
         category: formData.category,
         featured: formData.featured,
         tags: formData.tags
@@ -173,7 +183,7 @@ const EditBlogPage = () => {
       const response = await updateBlog({
         userId: user.id,
         dataId: id,
-        updatedBlog :blogData
+        updatedBlog: blogData,
       });
 
       if (response.success) {
@@ -240,6 +250,14 @@ const EditBlogPage = () => {
 
             {/* RIGHT ACTIONS */}
             <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                leftIcon={ImagePlus}
+                className="rounded-xl bg-zinc-900"
+                onClick={() => setShowCoverModal(true)}
+              >
+                Cover
+              </Button>
               <Button
                 variant="outline"
                 leftIcon={Eye}
@@ -416,6 +434,14 @@ const EditBlogPage = () => {
         onClose={() => setShowPreview(false)}
         formData={formData}
         wordCount={wordCount}
+      />
+
+      {/* COVER IMAGE MODAL */}
+      <CoverImageModal
+        isOpen={showCoverModal}
+        onClose={() => setShowCoverModal(false)}
+        formData={formData}
+        setFormData={setFormData}
       />
     </ReactSignedIn>
   );
