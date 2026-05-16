@@ -26,7 +26,7 @@ const BlogsHeader = ({
 }) => {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
-    /* ---------------- NAV LINKS (EDIT HERE) ---------------- */
+  /* ---------------- NAV LINKS (EDIT HERE) ---------------- */
   const navLinks = useMemo(
     () => [
       {
@@ -45,7 +45,7 @@ const BlogsHeader = ({
         icon: Code2,
       },
     ],
-    []
+    [],
   );
 
   /* ---------------- Categories ---------------- */
@@ -116,21 +116,23 @@ const BlogsHeader = ({
   return (
     <header className="sticky top-0 z-40">
       {/* ---------------- Top Header ---------------- */}
-      <div className="flex items-center justify-between gap-3 py-4">
+      <div className="flex items-center justify-between gap-3 py-6">
         {/* ---------------- Left - Logo ---------------- */}
         <div className="flex min-w-0 items-center gap-3">
           {/* Logo */}
-          <img className="h-10 w-10" src="/logo.png" alt="Neuctra Logo" />
+          <img className="h-7 w-7" src="/logo.png" alt="Neuctra Logo" />
 
           {/* Text */}
           <div className="min-w-0">
-            <p className="truncate text-base font-black tracking-tight text-white">
-              Neuctra UI <span className="text-primary">Blog</span>
+            <p className="flex items-center gap-2 text-base font-black tracking-tight text-white">
+              Neuctra
+              <span className="h-4 w-px bg-zinc-600" />
+              <span className="text-primary">Blog</span>
             </p>
           </div>
         </div>
 
-       {/* NAV LINKS */}
+        {/* NAV LINKS */}
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((item) => {
             const Icon = item?.icon;
@@ -165,7 +167,7 @@ const BlogsHeader = ({
           </div>
 
           {/* Category */}
-          <div className="w-[240px]">
+          <div className="w-60">
             <Select
               prefixIcon={Filter}
               options={categories}
@@ -182,7 +184,7 @@ const BlogsHeader = ({
           </div>
 
           {/* Sort */}
-          <div className="w-[180px]">
+          <div className="w-45">
             <Select
               options={sortOptions}
               value={sortBy}

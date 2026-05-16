@@ -16,6 +16,7 @@ import {
   Eye,
   LayoutGrid,
   MoreVertical,
+  Newspaper,
 } from "lucide-react";
 
 import { Badge, Button, Dropdown, Input, useToast } from "@neuctra/ui";
@@ -225,89 +226,93 @@ const AdminPanelPage = () => {
       {/* ---------------- CONTENT ---------------- */}
       <main className="relative z-10 mx-auto max-w-7xl py-2">
         {/* ---------------- STATS ---------------- */}
-        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {/* Total */}
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-4 backdrop-blur-xl sm:p-5 lg:p-6">
-            <div className="mb-4 flex items-start justify-between gap-3">
-              <div className="rounded-2xl bg-primary/10 p-2.5 text-primary sm:p-3">
-                <FileText size={20} className="sm:size-5.5" />
+        {!loading && totalBlogs > 0 && (
+          <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {/* Total */}
+            <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-4 backdrop-blur-xl sm:p-5 lg:p-6">
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div className="rounded-2xl bg-primary/10 p-2.5 text-primary sm:p-3">
+                  <FileText size={20} className="sm:size-5.5" />
+                </div>
+
+                <span className="shrink-0 text-xs text-white/40">Total</span>
               </div>
 
-              <span className="shrink-0 text-xs text-white/40">Total</span>
-            </div>
+              <h2 className="wrap-break-words text-2xl font-bold sm:text-3xl">
+                {totalBlogs}
+              </h2>
 
-            <h2 className="wrap-break-words text-2xl font-bold sm:text-3xl">
-              {totalBlogs}
-            </h2>
-
-            <p className="mt-2 text-sm leading-relaxed text-white/40">
-              Total blogs created
-            </p>
-          </div>
-
-          {/* Featured */}
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-4 backdrop-blur-xl sm:p-5 lg:p-6">
-            <div className="mb-4 flex items-start justify-between gap-3">
-              <div className="rounded-2xl bg-primary/10 p-2.5 text-primary sm:p-3">
-                <Star size={20} className="sm:size-5.5" />
-              </div>
-
-              <span className="shrink-0 text-xs text-white/40">Featured</span>
-            </div>
-
-            <h2 className="wrap-break-words text-2xl font-bold sm:text-3xl">
-              {featuredBlogs}
-            </h2>
-
-            <p className="mt-2 text-sm leading-relaxed text-white/40">
-              Featured blog posts
-            </p>
-          </div>
-
-          {/* Public */}
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-4 backdrop-blur-xl sm:p-5 lg:p-6 sm:col-span-2 xl:col-span-1">
-            <div className="mb-4 flex items-start justify-between gap-3">
-              <div className="rounded-2xl bg-primary/10 p-2.5 text-primary sm:p-3">
-                <Eye size={20} className="sm:size-5.5" />
-              </div>
-
-              <span className="shrink-0 text-xs text-white/40">Public</span>
-            </div>
-
-            <h2 className="wrap-break-words text-2xl font-bold sm:text-3xl">
-              {publicBlogs}
-            </h2>
-
-            <p className="mt-2 text-sm leading-relaxed text-white/40">
-              Public visible blogs
-            </p>
-          </div>
-        </div>
-
-        {/* ---------------- SEARCH ---------------- */}
-        <div className="mb-4 rounded-3xl border border-zinc-800 bg-zinc-900 p-5 backdrop-blur-xl">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Manage Blogs</h2>
-
-              <p className="text-sm text-white/40">
-                Search and manage all your blog content
+              <p className="mt-2 text-sm leading-relaxed text-white/40">
+                Total blogs created
               </p>
             </div>
 
-            <div className="w-full md:max-w-md">
-              <Input
-                type="text"
-                prefixIcon={Search}
-                placeholder="Search by title, category..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                wrapperClassName="w-full"
-                inputClassName="bg-zinc-950!"
-              />
+            {/* Featured */}
+            <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-4 backdrop-blur-xl sm:p-5 lg:p-6">
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div className="rounded-2xl bg-primary/10 p-2.5 text-primary sm:p-3">
+                  <Star size={20} className="sm:size-5.5" />
+                </div>
+
+                <span className="shrink-0 text-xs text-white/40">Featured</span>
+              </div>
+
+              <h2 className="wrap-break-words text-2xl font-bold sm:text-3xl">
+                {featuredBlogs}
+              </h2>
+
+              <p className="mt-2 text-sm leading-relaxed text-white/40">
+                Featured blog posts
+              </p>
+            </div>
+
+            {/* Public */}
+            <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-4 backdrop-blur-xl sm:p-5 lg:p-6 sm:col-span-2 xl:col-span-1">
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div className="rounded-2xl bg-primary/10 p-2.5 text-primary sm:p-3">
+                  <Eye size={20} className="sm:size-5.5" />
+                </div>
+
+                <span className="shrink-0 text-xs text-white/40">Public</span>
+              </div>
+
+              <h2 className="wrap-break-words text-2xl font-bold sm:text-3xl">
+                {publicBlogs}
+              </h2>
+
+              <p className="mt-2 text-sm leading-relaxed text-white/40">
+                Public visible blogs
+              </p>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* ---------------- SEARCH ---------------- */}
+        {blogs?.length > 0 && (
+          <div className="mb-4 rounded-3xl border border-zinc-800 bg-zinc-900 p-5 backdrop-blur-xl">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Manage Blogs</h2>
+
+                <p className="text-sm text-white/40">
+                  Search and manage all your blog content
+                </p>
+              </div>
+
+              <div className="w-full md:max-w-md">
+                <Input
+                  type="text"
+                  prefixIcon={Search}
+                  placeholder="Search by title, category..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  wrapperClassName="w-full"
+                  inputClassName="bg-zinc-950!"
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ---------------- LOADING ---------------- */}
         {loading ? (
@@ -319,24 +324,16 @@ const AdminPanelPage = () => {
             </div>
           </div>
         ) : filteredBlogs.length === 0 ? (
-          <div className="flex min-h-75 flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-white/5 text-center">
-            <div className="mb-5 rounded-3xl bg-primary/10 p-5 text-primary">
-              <Sparkles size={40} />
-            </div>
+          <div className="flex min-h-75 flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-card/30 text-center">
+            <Newspaper className="w-14 h-14 text-muted-foreground" />
 
-            <h3 className="text-xl font-semibold">No Blogs Found</h3>
+            <h3 className="mt-5 text-xl font-semibold text-foreground">
+              No blogs found
+            </h3>
 
-            <p className="mt-2 max-w-md text-sm text-white/40">
-              Try searching with a different keyword or create your first blog
-              post.
+            <p className="mt-2 text-sm text-muted-foreground">
+              Start publishing your first article.
             </p>
-
-            <Link
-              to="/blog/admin/create"
-              className="mt-6 rounded-xl bg-primary px-5 py-3 text-sm font-medium"
-            >
-              Create New Blog
-            </Link>
           </div>
         ) : (
           <div className="grid gap-5">

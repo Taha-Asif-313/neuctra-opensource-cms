@@ -13,7 +13,7 @@ const AllBlogsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
 
-  
+  console.log(blogs);
 
   /* ---------------- FETCH BLOGS ---------------- */
   useEffect(() => {
@@ -50,23 +50,18 @@ const AllBlogsPage = () => {
         excerpt.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCategory =
-        selectedCategory === "all" ||
-        blog.category === selectedCategory;
+        selectedCategory === "all" || blog.category === selectedCategory;
 
       return matchesSearch && matchesCategory;
     });
 
     /* Sort */
     if (sortBy === "latest") {
-      filtered.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
 
     if (sortBy === "oldest") {
-      filtered.sort(
-        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-      );
+      filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     }
 
     if (sortBy === "popular") {
@@ -94,8 +89,12 @@ const AllBlogsPage = () => {
       <div className="mx-auto max-w-7xl py-6">
         {/* Loading */}
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <p className="text-gray-400">Loading blogs...</p>
+          <div className="flex min-h-screen items-center justify-center">
+            <div className="text-center">
+              <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+
+              <p className="text-white/50">Loading blogs...</p>
+            </div>
           </div>
         ) : (
           <>

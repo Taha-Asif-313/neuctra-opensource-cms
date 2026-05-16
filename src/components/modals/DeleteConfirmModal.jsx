@@ -21,7 +21,11 @@ export default function DeleteConfirmModal({
     <Modal isOpen={isOpen} onClose={onClose} disableOverlayClose={loading}>
       <ModalContent onClose={onClose}>
         <ModalHeader
-          icon={<div className="p-2 rounded-lg bg-destructive/5 text-destructive" ><Trash2 size={18} /></div> }
+          icon={
+            <div className="p-2 rounded-lg bg-destructive/5 text-destructive">
+              <Trash2 size={18} />
+            </div>
+          }
           title={title}
           onClose={onClose}
         />

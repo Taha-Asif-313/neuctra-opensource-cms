@@ -20,8 +20,6 @@ const MainPage = () => {
 
       {/* Main Content */}
       <div className="relative py-10 z-10 max-w-4xl text-center flex flex-col items-center">
-    
-
         {/* Heading */}
         <Text className="text-4xl sm:text-6xl font-bold leading-none">
           Welcome To{" "}
@@ -30,9 +28,9 @@ const MainPage = () => {
 
         {/* Description */}
         <Text className="mt-6 max-w-2xl text-base opacity-80 leading-8">
-          A modern, flexible, and developer-friendly content management
-          platform designed for building blogs, dashboards, and scalable web
-          experiences with simplicity and performance in mind.
+          A modern, flexible, and developer-friendly content management platform
+          designed for building blogs, dashboards, and scalable web experiences
+          with simplicity and performance in mind.
         </Text>
 
         {/* Buttons */}
@@ -59,8 +57,12 @@ const MainPage = () => {
         {/* Bottom Stats / Features */}
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-5 w-full">
           <div className="rounded-2xl text-center border border-white/10 bg-white/5 backdrop-blur-md p-6">
-            <Text className="!text-xl font-semibold mb-2">Fast Setup</Text>
-            <Text as="p" align="center" className="opacity-70 text-sm leading-6">
+            <Text className="text-xl! font-semibold mb-2">Fast Setup</Text>
+            <Text
+              as="p"
+              align="center"
+              className="opacity-70 text-sm leading-6"
+            >
               Start building your content platform quickly with clean and
               reusable components.
             </Text>
@@ -68,7 +70,11 @@ const MainPage = () => {
 
           <div className="rounded-2xl text-center border border-white/10 bg-white/5 backdrop-blur-md p-6">
             <Text className="text-xl font-semibold mb-2">Open Source</Text>
-            <Text as="p" align="center" className="opacity-70 text-sm leading-6">
+            <Text
+              as="p"
+              align="center"
+              className="opacity-70 text-sm leading-6"
+            >
               Fully customizable and community-driven architecture for modern
               developers.
             </Text>
@@ -76,7 +82,11 @@ const MainPage = () => {
 
           <div className="rounded-2xl text-center border border-white/10 bg-white/5 p-6 ">
             <Text className="text-xl font-semibold mb-2">Modern UI</Text>
-            <Text as="p" align="center" className="opacity-70 text-sm leading-6">
+            <Text
+              as="p"
+              align="center"
+              className="opacity-70 text-sm leading-6"
+            >
               Elegant interface with responsive layouts and clean user
               experience across devices.
             </Text>

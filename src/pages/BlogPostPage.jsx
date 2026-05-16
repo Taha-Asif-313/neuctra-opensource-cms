@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Calendar, Clock, User, ArrowLeft, Tag } from "lucide-react";
 import { NeuctraEditorPreview } from "@neuctra/cms-core";
 import { getSingleBlog } from "../services/blog";
+import { Button } from "@neuctra/ui";
 
 const BlogPostPage = () => {
+  const navigate = useNavigate();
   const { userId, blogId } = useParams();
   const [blog, setBlog] = useState(null);
   const [relatedBlogs, setRelatedBlogs] = useState([]);
@@ -88,133 +90,116 @@ const BlogPostPage = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-{/* HERO */}
-<section className="relative overflow-hidden border-b border-zinc-900">
-  {/* BACKGROUND GLOW */}
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-primary/10 blur-3xl rounded-full opacity-40" />
-
-    <div className="absolute top-20 right-0 w-[300px] h-[300px] bg-white/5 blur-3xl rounded-full" />
-  </div>
-
-  <div className="relative max-w-7xl mx-auto px-4 md:px-6 pt-14 md:pt-20 pb-12 md:pb-20">
-    {/* BADGES */}
-    <div className="flex flex-wrap items-center gap-3 mb-8">
-      {category && (
-        <span className="px-4 py-1.5 rounded-full border border-zinc-800 bg-zinc-900/80 backdrop-blur-xl text-xs font-medium text-zinc-300">
-          {category}
-        </span>
-      )}
-
-      {featured && (
-        <span className="px-4 py-1.5 rounded-full border border-primary/20 bg-primary/10 text-xs font-medium text-primary shadow-[0_0_30px_rgba(255,255,255,0.03)]">
-           Featured Article
-        </span>
-      )}
-    </div>
-
-    {/* TITLE */}
-    <div className="max-w-5xl">
-      <h1 className="text-4xl sm:text-5xl md:text-7xl font-semibold leading-[1.05] tracking-[-0.04em] text-white">
-        {title}
-      </h1>
-
-      {/* OPTIONAL EXCERPT */}
-      {excerpt && (
-        <p className="mt-7 max-w-3xl text-base md:text-xl leading-relaxed text-zinc-400">
-          {excerpt}
-        </p>
-      )}
-    </div>
-
-    {/* META CARD */}
-    <div className="mt-10 flex flex-wrap items-center gap-4">
-      {/* AUTHOR */}
-      {author?.name && (
-        <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-zinc-800 bg-zinc-950/80 backdrop-blur-xl">
-          {author?.avatar ? (
+      {/* HERO */}
+      <section className="relative overflow-hidden rounded-b-4xl">
+        {/* BACKGROUND IMAGE */}
+        {coverImage && (
+          <div className="absolute inset-0">
             <img
-              src={author.avatar}
-              alt={author.name}
-              className="w-10 h-10 rounded-full object-cover border border-zinc-800"
+              src={coverImage}
+              alt={title}
+              className="h-full w-full object-cover opacity-40 scale-105"
             />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-              <User size={16} />
-            </div>
-          )}
 
-          <div>
-            <p className="text-xs text-zinc-500">Written by</p>
+            {/* DARK OVERLAY for readability */}
+            <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-black/30" />
+          </div>
+        )}
 
-            <p className="text-sm font-medium text-white">
-              {author.name}
-            </p>
+        <div className="relative max-w-7xl mx-auto px-4 md:px-6 pt-14 pb-12">
+          <Button
+            onClick={() => navigate("/blog")}
+            variant="ghost"
+            className="mb-4 hover:bg-zinc-950/5"
+          >
+            <ArrowLeft size={20} />
+          </Button>
+          {/* BADGES */}
+          <div className="flex flex-wrap items-center gap-3 mb-2">
+            {category && (
+              <span className="px-4 py-1.5 rounded-full border border-zinc-800 bg-zinc-900/80 backdrop-blur-xl text-xs font-medium text-zinc-300">
+                {category}
+              </span>
+            )}
+
+            {featured && (
+              <span className="px-4 py-1.5 rounded-full border border-primary/20 bg-primary/10 text-xs font-medium text-primary shadow-[0_0_30px_rgba(255,255,255,0.03)]">
+                Featured Article
+              </span>
+            )}
+          </div>
+
+          {/* TITLE */}
+          <div className="max-w-5xl">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-semibold leading-[1.05] tracking-[-0.04em] text-white">
+              {title}
+            </h1>
+          </div>
+
+          {/* META CARD */}
+          <div className="mt-4 flex flex-wrap items-center gap-4">
+            {/* AUTHOR */}
+            {author?.name && (
+              <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-zinc-800 bg-zinc-950/80 backdrop-blur-xl">
+                {author?.avatar ? (
+                  <img
+                    src={author.avatar}
+                    alt={author.name}
+                    className="w-10 h-10 rounded-full object-cover border border-zinc-800"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+                    <User size={16} />
+                  </div>
+                )}
+
+                <div>
+                  <p className="text-xs text-zinc-500">Written by</p>
+
+                  <p className="text-sm font-medium text-white">
+                    {author.name}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* DATE */}
+            {displayDate && (
+              <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-zinc-800 bg-zinc-950/80 backdrop-blur-xl">
+                <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+                  <Calendar size={16} className="text-zinc-400" />
+                </div>
+
+                <div>
+                  <p className="text-xs text-zinc-500">Published</p>
+
+                  <p className="text-sm font-medium text-white">
+                    {new Date(displayDate).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* READ TIME */}
+            {readTime && (
+              <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-zinc-800 bg-zinc-950/80 backdrop-blur-xl">
+                <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+                  <Clock size={16} className="text-zinc-400" />
+                </div>
+
+                <div>
+                  <p className="text-xs text-zinc-500">Read Time</p>
+
+                  <p className="text-sm font-medium text-white">{readTime}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </section>
 
-      {/* DATE */}
-      {displayDate && (
-        <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-zinc-800 bg-zinc-950/80 backdrop-blur-xl">
-          <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-            <Calendar size={16} className="text-zinc-400" />
-          </div>
-
-          <div>
-            <p className="text-xs text-zinc-500">Published</p>
-
-            <p className="text-sm font-medium text-white">
-              {new Date(displayDate).toLocaleDateString()}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* READ TIME */}
-      {readTime && (
-        <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-zinc-800 bg-zinc-950/80 backdrop-blur-xl">
-          <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-            <Clock size={16} className="text-zinc-400" />
-          </div>
-
-          <div>
-            <p className="text-xs text-zinc-500">Read Time</p>
-
-            <p className="text-sm font-medium text-white">
-              {readTime}
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
-
-    {/* COVER IMAGE */}
-    {coverImage && (
-      <div className="relative mt-14">
-        {/* IMAGE GLOW */}
-        <div className="absolute inset-0 bg-white/5 blur-3xl scale-95 rounded-[40px]" />
-
-        <div className="relative overflow-hidden rounded-[32px] border border-zinc-800 bg-zinc-950 shadow-2xl">
-          <img
-            src={coverImage}
-            alt={title}
-            className="w-full h-[260px] sm:h-[380px] md:h-[620px] object-cover"
-          />
-
-          {/* OVERLAY */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-        </div>
-      </div>
-    )}
-  </div>
-</section>
-
-      {/* =====================================================
-          CONTENT
-      ===================================================== */}
-
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-10">
+      {/* CONTENT */}
+      <div className="max-w-7xl mx-auto py-6 grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* CONTENT */}
         <main className="lg:col-span-8">
           <article className="min-w-0">
