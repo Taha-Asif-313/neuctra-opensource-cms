@@ -25,15 +25,15 @@ const LoginPage = () => {
           logoUrl="/logo.png"
           title="Sign in to Neuctra Admin"
           subtitle="Access your blog dashboard"
-       onSuccess={(user) => {
-  if (user.isVerified) {
-    navigate("/admin");
-  } else {
-    navigate("/verify-email", {
-      state: { user },
-    });
-  }
-}}
+          onSuccess={(user) => {
+            if (user.isVerified) {
+              navigate("/blog/admin");
+            } else {
+              navigate("/blog/verify-email", {
+                state: { user },
+              });
+            }
+          }}
         />
       </div>
     </div>

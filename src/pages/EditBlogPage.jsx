@@ -1,162 +1,183 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
-import {
-  ArrowLeft,
-  Save,
-  Sparkles,
-  Folder,
-  Tag,
-  PenSquare,
-  Eye,
-} from "lucide-react";
+import { ArrowLeft, Save, Eye, Sparkles, Folder, Tag } from "lucide-react";
 
-import { Input, Textarea, Select, Button, Checkbox } from "@neuctra/ui";
+import { Input, Select, Button, Checkbox, Switch } from "@neuctra/ui";
 
-import { getSingleBlog, updateBlog } from "../services/blog";
 import { useAdmin } from "../contexts/AdminContext";
+import { getSingleBlog, updateBlog } from "../services/blog";
+
 import { ReactSignedIn } from "@neuctra/authix";
+import { NeuctraEditor, NeuctraEditorPreview } from "@neuctra/cms-core";
+
+import { createBlock } from "../utils/blogBlocks";
+import { defaultBlogState } from "../states/blog";
+import BlogPreviewModal from "../components/BlogPreviewModal";
+
+/* =========================================================
+   PAGE
+========================================================= */
 
 const EditBlogPage = () => {
   const { id } = useParams();
-  const { user } = useAdmin();
-console.log(user);
-
   const navigate = useNavigate();
 
-  /* ---------------- STATE ---------------- */
-  const [loading, setLoading] = useState(true);
+  const { user } = useAdmin();
 
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const [blog, setBlog] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
 
-  const [formData, setFormData] = useState({
-    title: "",
-    excerpt: "",
-    content: "",
-    category: "React",
-    tags: "",
-    featured: false,
-  });
+  const [formData, setFormData] = useState(null);
 
-  /* ---------------- Categories ---------------- */
+  /* =========================================================
+     CATEGORIES
+  ========================================================= */
+
   const categories = [
     { label: "React", value: "React" },
-    {
-      label: "JavaScript",
-      value: "JavaScript",
-    },
+    { label: "JavaScript", value: "JavaScript" },
     { label: "CSS", value: "CSS" },
-    {
-      label: "Tutorial",
-      value: "Tutorial",
-    },
-    {
-      label: "Design",
-      value: "Design",
-    },
-    {
-      label: "Development",
-      value: "Development",
-    },
+    { label: "Tutorial", value: "Tutorial" },
+    { label: "Design", value: "Design" },
+    { label: "Development", value: "Development" },
   ];
 
-  /* ---------------- FETCH BLOG ---------------- */
-useEffect(() => {
-  const fetchBlog = async () => {
-    try {
-      setLoading(true);
+  /* =========================================================
+     FETCH BLOG
+  ========================================================= */
 
-      if (!user?.id || !id) return;
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        setLoading(true);
 
-      const response =
-        await getSingleBlog(
-          user.id,
-          id
-        );
+        if (!user?.id || !id) return;
 
-      if (
-        response.success &&
-        response.data
-      ) {
-        const blogData =
-          response.data;
+        const response = await getSingleBlog(user.id, id);
 
-        setBlog(blogData);
+        if (response.success && response.data) {
+          const blogData = response.data;
 
-        setFormData({
-          title:
-            blogData.title || "",
+          setBlog(blogData);
 
-          excerpt:
-            blogData.excerpt ||
-            "",
-
-          content:
-            blogData.content ||
-            "",
-
-          category:
-            blogData.category ||
-            "React",
-
-          tags: Array.isArray(
-            blogData.tags
-          )
-            ? blogData.tags.join(
-                ", "
-              )
-            : "",
-
-          featured:
-            blogData.featured ||
-            false,
-        });
+          // Map the existing blog data to our form state
+          setFormData(
+            defaultBlogState({
+              id: blogData.id || "",
+              slug: blogData.slug || "",
+              title: blogData.title || "",
+              excerpt: blogData.excerpt || "",
+              coverImage: blogData.coverImage || "",
+              authorId: blogData.authorId || user?.id || "",
+              author: {
+                name: blogData.author?.name || user?.name || "",
+                username: blogData.author?.username || user?.username || "",
+                avatar: blogData.author?.avatar || user?.avatar || "",
+              },
+              category: blogData.category || "React",
+              tags: Array.isArray(blogData.tags)
+                ? blogData.tags.join(", ")
+                : blogData.tags || "",
+              blocks: blogData.blocks?.length
+                ? blogData.blocks
+                : [createBlock("text")],
+              featured: blogData.featured || false,
+              visibility: blogData.visibility || "public",
+              readTime: blogData.readTime || 0,
+              views: blogData.views || 0,
+              likes: blogData.likes || [],
+              bookmarks: blogData.bookmarks || [],
+              commentsCount: blogData.commentsCount || 0,
+              createdAt: blogData.createdAt || "",
+              updatedAt: blogData.updatedAt || "",
+              publishedAt: blogData.publishedAt || "",
+            }),
+          );
+        }
+      } catch (error) {
+        console.error("Fetch Blog Error:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error(
-        "Fetch Blog Error:",
-        error
-      );
-    } finally {
-      setLoading(false);
+    };
+
+    fetchBlog();
+  }, [id, user]);
+
+  //  CONTENT JSON
+  const generatedContent = useMemo(() => {
+    if (!formData?.blocks) return "";
+    return JSON.stringify(formData.blocks, null, 2);
+  }, [formData?.blocks]);
+
+  //  WORD COUNT
+  const wordCount = useMemo(() => {
+    if (!formData?.blocks) return 0;
+
+    return formData.blocks.reduce((acc, block) => {
+      if (block.content) {
+        return acc + block.content.split(" ").length;
+      }
+
+      if (block.items) {
+        return acc + block.items.join(" ").split(" ").length;
+      }
+
+      return acc;
+    }, 0);
+  }, [formData?.blocks]);
+
+  //  SET BLOCKS
+  const setBlocks = (value) => {
+    if (typeof value === "function") {
+      setFormData((prev) => ({
+        ...prev,
+        blocks: value(prev.blocks),
+      }));
+
+      return;
     }
+
+    setFormData((prev) => ({
+      ...prev,
+      blocks: value,
+    }));
   };
 
-  fetchBlog();
-}, [id, user]);
-
-  /* ---------------- UPDATE BLOG ---------------- */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  //  SUBMIT
+  const handleSubmit = async () => {
     try {
       setSaving(true);
 
-      const response = await updateBlog({
-        dataId: id,
-
+      const blogData = {
         title: formData.title,
-
         excerpt: formData.excerpt,
-
-        content: formData.content,
-
         category: formData.category,
-
         featured: formData.featured,
-
         tags: formData.tags
           .split(",")
-          .map((tag) => tag.trim())
+          .map((t) => t.trim())
           .filter(Boolean),
+        blocks: formData.blocks,
+        content: generatedContent,
+        readTime: `${Math.ceil(wordCount / 200)} min read`,
+        updatedAt: new Date().toISOString(),
+      };
+
+      const response = await updateBlog({
+        userId: user.id,
+        dataId: id,
+        updatedBlog :blogData
       });
 
       if (response.success) {
-        navigate("/admin");
+        navigate("/blog/admin");
       }
     } catch (error) {
       console.error("Update Blog Error:", error);
@@ -165,17 +186,21 @@ useEffect(() => {
     }
   };
 
-  /* ---------------- LOADING ---------------- */
+  //  LOADING STATE
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black text-white">
-        <p className="text-white/50">Loading blog...</p>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+
+          <p className="text-white/50">Loading blogs...</p>
+        </div>
       </div>
     );
   }
 
-  /* ---------------- NOT FOUND ---------------- */
-  if (!blog) {
+  //  NOT FOUND STATE
+  if (!blog || !formData) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-black text-white">
         <p className="text-white/50">Blog not found</p>
@@ -185,220 +210,213 @@ useEffect(() => {
 
   return (
     <ReactSignedIn fallback={<Navigate to="/login" replace />}>
-      <div className="min-h-screen overflow-hidden bg-black text-white">
-        {/* ---------------- TOP BAR ---------------- */}
-        <div className="sticky top-0 z-40 border-b border-white/10 bg-black/60 backdrop-blur-xl">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-5">
-            {/* Left */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate("/admin")}
-                className="flex items-center gap-2 text-white/60 transition hover:text-white"
+      <div className="min-h-screen bg-black text-white flex flex-col">
+        {/* TOP BAR */}
+        <div className="sticky top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-2xl">
+          <div className="max-w-7xl mx-auto py-4 flex items-center justify-between gap-4">
+            {/* LEFT */}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                iconBefore={<ArrowLeft size={18} />}
+                onClick={() => navigate("/blog/admin")}
+                className="flex items-center gap-2  hover:text-white transition"
               >
-                <ArrowLeft size={18} />
                 Back
-              </button>
-
-              <div className="hidden h-6 w-px bg-white/10 md:block" />
-
-              <div className="hidden md:block">
-                <h1 className="text-sm font-medium text-white">Edit Blog</h1>
-
-                <p className="max-w-[260px] truncate text-xs text-white/40">
-                  {blog.title}
-                </p>
-              </div>
+              </Button>
             </div>
 
-            {/* Right */}
-            <Button
-              onClick={handleSubmit}
-              leftIcon={Save}
-              size="md"
-              loading={saving}
-            >
-              {saving ? "Updating..." : "Update Blog"}
-            </Button>
+            {/* CENTER TITLE INPUT */}
+            <div className="flex-1 max-w-2xl hidden md:block relative">
+              <input
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, title: e.target.value }))
+                }
+                placeholder="Untitled Article..."
+                className="w-full h-10 bg-transparent text-lg font-semibold border-b border-zinc-400 outline-none placeholder:text-zinc-400 focus:border-primary transition"
+              />
+            </div>
+
+            {/* RIGHT ACTIONS */}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                leftIcon={Eye}
+                className="rounded-xl bg-zinc-900"
+                onClick={() => setShowPreview(true)}
+              >
+                Preview
+              </Button>
+
+              <Button
+                leftIcon={Save}
+                loading={saving}
+                onClick={handleSubmit}
+                className="rounded-xl"
+              >
+                {saving ? "Updating..." : "Update"}
+              </Button>
+            </div>
+          </div>
+
+          {/* MOBILE TITLE */}
+          <div className="md:hidden pb-4">
+            <Input
+              value={formData.title}
+              onChange={(e) =>
+                setFormData((p) => ({ ...p, title: e.target.value }))
+              }
+              placeholder="Untitled Article..."
+              className="h-11 bg-white/5 border-white/10 text-lg font-semibold rounded-xl"
+            />
           </div>
         </div>
 
-        {/* ---------------- MAIN LAYOUT ---------------- */}
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 bg-black px-6 py-10 lg:grid-cols-12">
-          {/* LEFT SIDE */}
-          <div className="space-y-8 lg:col-span-8">
-            {/* Title */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm text-white/50">
-                <PenSquare size={15} />
-                Blog Title
-              </div>
-
-              <Input
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    title: e.target.value,
-                  })
-                }
-                placeholder="Enter your article title..."
-                size="lg"
-                wrapperClassName="w-full"
-                className="text-2xl font-bold md:text-4xl"
-              />
-            </div>
-
-            {/* Excerpt */}
-            <div className="space-y-3">
-              <div className="text-sm text-white/50">Short Description</div>
-
-              <Textarea
-                rows={4}
-                value={formData.excerpt}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    excerpt: e.target.value,
-                  })
-                }
-                placeholder="Write a short summary..."
-              />
-            </div>
-
-            {/* Content */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm text-white/50">
-                <Sparkles size={15} />
-                Article Content
-              </div>
-
-              <Textarea
-                rows={22}
-                value={formData.content}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    content: e.target.value,
-                  })
-                }
-                placeholder="Write your content..."
-                className="font-mono text-sm leading-relaxed"
-              />
-            </div>
+        {/* MAIN CONTENT */}
+        <div className="flex-1 max-w-7xl mx-auto w-full py-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
+          {/* LEFT: EDITOR */}
+          <div className="lg:col-span-8">
+            <NeuctraEditor
+              className="py-0! px-0!"
+              blocks={formData.blocks}
+              setBlocks={setBlocks}
+            />
           </div>
 
-          {/* RIGHT SIDE */}
-          <div className="lg:col-span-4">
-            <div className="space-y-6">
-              {/* Settings */}
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                <div className="mb-5 flex items-center gap-2">
-                  <Folder size={16} className="text-primary" />
-
-                  <h3 className="font-medium text-white">Edit Settings</h3>
-                </div>
-
-                <div className="space-y-5">
-                  {/* Category */}
-                  <Select
-                    label="Category"
-                    options={categories}
-                    value={formData.category}
-                    maxDropdownHeight={280}
-                    onValueChange={(value) =>
-                      setFormData({
-                        ...formData,
-                        category: value,
-                      })
-                    }
-                    placeholder="Select category"
-                  />
-
-                  {/* Tags */}
-                  <div>
-                    <label className="mb-2 block text-xs text-white/50">
-                      Tags
-                    </label>
-
-                    <Input
-                      prefixIcon={Tag}
-                      value={formData.tags}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          tags: e.target.value,
-                        })
-                      }
-                      placeholder="react, ui, saas"
-                    />
-                  </div>
-
-                  {/* Featured */}
-                  <Checkbox
-                    checked={formData.featured}
-                    onCheckedChange={(checked) =>
-                      setFormData({
-                        ...formData,
-                        featured: checked,
-                      })
-                    }
-                    label="Featured post"
-                  />
-                </div>
+          {/* RIGHT: SIDEBAR */}
+          <div className="lg:col-span-4 space-y-2">
+            {/* PUBLISH SETTINGS */}
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+              <div className="flex items-center gap-2 mb-5">
+                <Folder size={16} className="text-primary" />
+                <h3 className="font-medium">Publish Settings</h3>
               </div>
 
-              {/* AI Assistant */}
-              <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 backdrop-blur-xl">
-                <div className="mb-3 flex items-center gap-2 text-primary">
-                  <Sparkles size={16} />
+              <div className="space-y-4">
+                <Select
+                  label="Category"
+                  triggerClassName="bg-zinc-950/50!"
+                  options={categories}
+                  value={formData.category}
+                  onValueChange={(value) =>
+                    setFormData((p) => ({ ...p, category: value }))
+                  }
+                />
 
-                  <h3 className="font-medium">AI Assistant</h3>
-                </div>
+                <Input
+                  prefixIcon={Tag}
+                  value={formData.tags}
+                  inputClassName="bg-zinc-950/50!"
+                  onChange={(e) =>
+                    setFormData((p) => ({ ...p, tags: e.target.value }))
+                  }
+                  label="Tags"
+                  placeholder="react, ui, saas"
+                />
 
-                <p className="text-sm leading-relaxed text-white/50">
-                  Improve readability, optimize SEO, or rewrite content.
-                </p>
+                {/* FEATURED SWITCH */}
+                <Switch
+                  mode="single"
+                  label="Featured article"
+                  checked={formData.featured}
+                  onCheckedChange={(checked) =>
+                    setFormData((p) => ({
+                      ...p,
+                      featured: Boolean(checked),
+                    }))
+                  }
+                />
 
-                <Button variant="outline" className="mt-4 w-full">
-                  Optimize Post
-                </Button>
+                {/* VISIBILITY SWITCH */}
+                <Switch
+                  mode="single"
+                  label="Public visibility"
+                  checked={formData.visibility === "public"}
+                  onCheckedChange={(checked) =>
+                    setFormData((p) => ({
+                      ...p,
+                      visibility: checked ? "public" : "private",
+                    }))
+                  }
+                />
+              </div>
+            </div>
+
+            {/* CONTENT STATS */}
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Eye size={15} />
+                <h3 className="font-medium">Content Stats</h3>
               </div>
 
-              {/* Preview */}
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
-                <div className="mb-4 flex items-center gap-2 text-white/70">
-                  <Eye size={15} />
-
-                  <h3 className="font-medium">Live Preview</h3>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-white/50">Blocks</span>
+                  <span>{formData.blocks.length}</span>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs text-primary">
-                      {formData.category}
-                    </span>
+                <div className="flex justify-between">
+                  <span className="text-white/50">Words</span>
+                  <span>{wordCount}</span>
+                </div>
 
-                    {formData.featured && (
-                      <span className="rounded-md border border-white/10 bg-white/10 px-2 py-1 text-xs text-white/70">
-                        Featured
-                      </span>
-                    )}
-                  </div>
+                <div className="flex justify-between">
+                  <span className="text-white/50">Read Time</span>
+                  <span>{Math.ceil(wordCount / 200)} min</span>
+                </div>
 
-                  <h2 className="line-clamp-2 text-lg font-semibold text-white">
-                    {formData.title || "Your blog title preview"}
-                  </h2>
-
-                  <p className="line-clamp-4 text-sm text-white/50">
-                    {formData.excerpt ||
-                      "Your excerpt preview will appear here..."}
-                  </p>
+                <div className="flex justify-between">
+                  <span className="text-white/50">Views</span>
+                  <span>{formData.views}</span>
                 </div>
               </div>
             </div>
+
+            {/* BLOG INFO */}
+            {formData.createdAt && (
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+                <h3 className="font-medium mb-3">Blog Info</h3>
+
+                <div className="space-y-2 text-xs text-white/50">
+                  <div className="flex justify-between">
+                    <span>Created</span>
+                    <span>
+                      {new Date(formData.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  {formData.updatedAt && (
+                    <div className="flex justify-between">
+                      <span>Updated</span>
+                      <span>
+                        {new Date(formData.updatedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+
+                  {formData.publishedAt && (
+                    <div className="flex justify-between">
+                      <span>Published</span>
+                      <span>
+                        {new Date(formData.publishedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* PREVIEW MODAL */}
+      <BlogPreviewModal
+        open={showPreview}
+        onClose={() => setShowPreview(false)}
+        formData={formData}
+        wordCount={wordCount}
+      />
     </ReactSignedIn>
   );
 };

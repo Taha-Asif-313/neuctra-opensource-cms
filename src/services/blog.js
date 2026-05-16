@@ -43,7 +43,7 @@ export const getAllBlogs = async () => {
 /* =========================================================
    GET SINGLE BLOG
 ========================================================= */
-export const getSingleBlog = async (userId,dataId) => {
+export const getSingleBlog = async (userId, dataId) => {
   try {
     const blog = await authix.getSingleUserData({
       userId,
@@ -88,34 +88,12 @@ export const getUserBlogs = async (userId) => {
 /* =========================================================
    UPDATE BLOG
 ========================================================= */
-export const updateBlog = async ({
-  dataId,
-  title,
-  content,
-  coverImage,
-  tags,
-  published,
-}) => {
+export const updateBlog = async ({ dataId, userId, updatedBlog }) => {
   try {
-    const response = await authix.updateAppData({
+    const response = await authix.updateUserData({
       dataId,
-      data: {
-        ...(title && {
-          title,
-          slug: title
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, "")
-            .replace(/\s+/g, "-"),
-        }),
-
-        ...(content && { content }),
-        ...(coverImage && { coverImage }),
-        ...(tags && { tags }),
-
-        ...(published !== undefined && { published }),
-
-        updatedAt: new Date().toISOString(),
-      },
+      userId,
+      data: updatedBlog,
     });
 
     return {

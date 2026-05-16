@@ -13,12 +13,13 @@ import BlogsLayout from "./BlogsLayout";
 
 import AllBlogsPage from "./pages/AllBlogsPage";
 import LoginPage from "./pages/LoginPage";
-import AdminPage from "./pages/AdminPage";
+import AdminPage from "./pages/AdminPanelPage";
 import CreateBlogPage from "./pages/CreateBlogPage";
 import BlogPostPage from "./pages/BlogPostPage";
 import { AdminProvider } from "./contexts/AdminContext";
 import VerifiyEmailPage from "./pages/VerifiyEmailPage";
 import EditBlogPage from "./pages/EditBlogPage";
+import MainPage from "./pages/MainPage";
 
 const App = () => {
   return (
@@ -31,7 +32,8 @@ const App = () => {
 
               <Suspense fallback={null}>
                 <Routes>
-                  <Route path="/" element={<BlogsLayout />}>
+                  <Route path="/" element={<MainPage />} />
+                  <Route path="/blog" element={<BlogsLayout />}>
                     <Route index element={<AllBlogsPage />} />
 
                     <Route path="login" element={<LoginPage />} />
@@ -41,7 +43,7 @@ const App = () => {
                         index
                         element={
                           <ReactSignedIn
-                            fallback={<Navigate to="/login" replace />}
+                            fallback={<Navigate to="/blog/login" replace />}
                           >
                             <AdminPage />
                           </ReactSignedIn>
