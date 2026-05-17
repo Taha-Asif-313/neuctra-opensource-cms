@@ -86,22 +86,31 @@ const BlogPostPage = () => {
     excerpt,
   } = blog;
 
+  // get image from blocks if cover image missing
+  const getCoverImage = (blog) => {
+    if (blog?.coverImage) return blog.coverImage;
+
+    const imageBlock = blog?.blocks?.find((b) => b.type === "image");
+
+    return imageBlock?.url || null;
+  };
+
   const displayDate = publishedAt || createdAt;
+  const heroImage = getCoverImage(blog);
 
   return (
     <div className="min-h-screen bg-black text-white">
       {/* HERO */}
       <section className="relative overflow-hidden rounded-b-4xl">
-        {/* BACKGROUND IMAGE */}
-        {coverImage && (
+        {heroImage && (
           <div className="absolute inset-0">
             <img
-              src={coverImage}
+              src={heroImage}
               alt={title}
               className="h-full w-full object-cover opacity-40 scale-105"
             />
 
-            {/* DARK OVERLAY for readability */}
+            {/* DARK OVERLAY */}
             <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-black/30" />
           </div>
         )}

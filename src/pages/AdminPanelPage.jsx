@@ -143,7 +143,7 @@ const AdminPanelPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen text-white">
       {/* ---------------- BACKGROUND ---------------- */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -left-100 top-0 h-100 w-100 rounded-full bg-primary/20 blur-3xl" />
