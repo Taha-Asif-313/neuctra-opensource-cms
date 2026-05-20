@@ -29,13 +29,13 @@ Neuctra CMS is designed for developers who want a flexible and clean content man
 - **React.js** (v19.2.5) - UI library
 - **Vite** (v8.0.10) - Build tool and dev server
 - **Tailwind CSS** (v4.3.0) - Utility-first CSS framework
-- **@neuctra/ui** (v0.2.40) - Reusable UI components
-- **@neuctra/authix** (v1.2.14) - Authentication handling
-- **@neuctra/cms-core** (v1.0.1) - Core CMS functionality
+- **@neuctra/ui** - Reusable UI components
+- **@neuctra/authix** - Authentication handling
+- **@neuctra/cms-core** - Core CMS functionality
 - **@monaco-editor/react** (v4.7.0) - Code editor component
 - **react-router-dom** (v7.15.0) - Client-side routing
 - **react-syntax-highlighter** (v15.6.6) - Code syntax highlighting
-- **lucide-react** (v1.14.0) - Icon library
+- **lucide-react** - Icon library
 
 ---
 
